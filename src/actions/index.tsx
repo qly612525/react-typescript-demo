@@ -1,23 +1,6 @@
-import * as constants from '../constants';
+import { startEditFn, endEditFn, StartEdit, EndEdit } from './mapactions';
 
-export interface IncrementEnthusiasm {
-    type: constants.INCREMENT_ENTHUSIASM;
-}
+export type EditAction = StartEdit | EndEdit;
 
-export interface DecrementEnthusiasm {
-    type: constants.DECREMENT_ENTHUSIASM;
-}
-
-export type EnthusiasmAction = IncrementEnthusiasm | DecrementEnthusiasm;
-
-export function incrementEnthusiasm(): IncrementEnthusiasm {
-    return {
-        type: constants.INCREMENT_ENTHUSIASM
-    }
-}
-
-export function decrementEnthusiasm(): DecrementEnthusiasm {
-    return {
-        type: constants.DECREMENT_ENTHUSIASM
-    }
-}
+export const startEdit = startEditFn;
+export const endEdit = endEditFn;

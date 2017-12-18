@@ -1,6 +1,5 @@
 export default {
-    demo: {
-        enthusiasmLevel: 1,
-        languageName: "TypeScript"
+    map: {
+        isOpen: false,
     }
 };

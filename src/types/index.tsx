@@ -1,8 +1,7 @@
-export interface demo {
-    languageName: string;
-    enthusiasmLevel?: number;
+export interface map {
+    isOpen: boolean;
 }
 
 export interface StoreState {
-    demo: demo;
+    map: map;
 }

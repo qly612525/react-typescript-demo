@@ -1,8 +1,9 @@
 import { combineReducers } from 'redux';
-import { enthusiasm } from './demo';
+import { mapReducer } from './map';
 
 const rootReducer = combineReducers({
-    demo: enthusiasm
+    map: mapReducer
 });
+
 
 export default rootReducer;

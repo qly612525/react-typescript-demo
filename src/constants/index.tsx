@@ -3,3 +3,9 @@ export type INCREMENT_ENTHUSIASM = typeof INCREMENT_ENTHUSIASM;
 
 export const DECREMENT_ENTHUSIASM = "DECREMENT_ENTHUSIASM";
 export type DECREMENT_ENTHUSIASM = typeof DECREMENT_ENTHUSIASM;
+
+export const START_EDIT = "START_EDIT";
+export type START_EDIT = typeof START_EDIT;
+
+export const END_EDIT = "END_EDIT";
+export type END_EDIT = typeof END_EDIT;
