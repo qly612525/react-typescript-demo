@@ -18,11 +18,13 @@
   },
   "dependencies": {
     "@types/material-ui": "^0.18.5",
+    "@types/openlayers": "^4.3.12",
     "@types/react": "^16.0.31",
     "@types/react-dom": "^16.0.3",
     "@types/react-redux": "^5.0.14",
     "css-loader": "^0.28.7",
     "material-ui": "^0.20.0",
+    "openlayers": "^4.6.4",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
