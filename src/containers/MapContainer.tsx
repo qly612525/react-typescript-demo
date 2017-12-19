@@ -5,13 +5,14 @@ import * as actions from '../actions';
 import { StoreState } from '../types';
 
 import * as ol from 'openlayers';
-
-interface window {
-    EzMap: (id: string, options?: {}) => void;
-}
+import { getTestMarker } from '../api/feature';
 
 interface Props {
     isOpen?: boolean;
+    mapObject?: ol.Map;
+    featureLayer?: ol.layer.Vector;
+    initMap?: () => ol.Map;
+    initFeatureLayer?: () => ol.layer.Vector;
     onEditStart?: () => void;
     onEditEnd?: () => void;
 }
@@ -21,45 +22,28 @@ class Map extends React.PureComponent<Props, {}> {
         super(props);
     }
 
-    componentDidMount() {
-        const map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.XYZ({
-                        url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}"
-                    })
-                }),
-                new ol.layer.Tile({
-                    source: new ol.source.XYZ({
-                        url: "http://t2.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}"
-                    })
-                })
-            ],
-            view: new ol.View({
-                projection: 'EPSG:4326',
-                center: [116, 39],
-                zoom: 5
-            })
-        });
-        const source = new ol.source.Vector();
-        const layer = new ol.layer.Vector({ source: source });
-        map.getLayers().getArray().push(layer);
-        
-        const feature = new ol.Feature({
-            geometry: new ol.geom.Point([116,39])
-        });
+    componentDidMount() { 
+        const { initMap, initFeatureLayer, mapObject,featureLayer } = this.props;
+        // 初始化地图
+        if (!mapObject) {
+            initMap();
+        }
+        // 添加要素图层
+        if (!featureLayer) {
+            initFeatureLayer();
+            // this.forceUpdate();
+        }
+    }
 
-        const style = new ol.style.Style({
-            image: new ol.style.Image({
-                img: '/images/video.png',
-                size: [20, 40],
-                anchor: [0.5, 1]
-            })
-        });
-        feature.setStyle(style);
-
-        source.addFeature(feature);
+    componentWillUpdate() {
+        const { featureLayer } = this.props;
+        if (!featureLayer) {
+            this.forceUpdate();
+            return;
+        }
+        // 撒点到地图上
+        const source = featureLayer.getSource();
+        source.addFeatures(getTestMarker());
     }
 
     editView() { 
@@ -82,14 +66,16 @@ class Map extends React.PureComponent<Props, {}> {
     }
 }
 
-function mapStateToProps({ map: { isOpen }}: StoreState) {
+function mapStateToProps({ map: { isOpen, mapObject, featureLayer }}: StoreState) {
     return {
-        isOpen,
+        isOpen, mapObject, featureLayer
     };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<actions.EditAction>) {
     return {
+        initMap: () => dispatch(actions.mapInit()),
+        initFeatureLayer: () => dispatch(actions.featureLayerInit()),
         onEditStart: () => dispatch(actions.startEdit()),
         onEditEnd: () => dispatch(actions.endEdit()),
     };
