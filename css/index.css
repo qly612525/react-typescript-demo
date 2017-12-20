@@ -10,15 +10,17 @@ html,body {
     height: 100vh;
 }
 
+.mapwrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+
 .map {
     width: 100%;
     height: 100%;
     background-color: gainsboro;
-    position: relative;
-}
-
-.map_btns {
-    position: absolute;
 }
 
 .map_editview {
@@ -26,5 +28,37 @@ html,body {
     height: 100vh;
     background-color: aqua;
     position: absolute;
+    top: 0;
     right: 0;
+    z-index: 10;
+}
+
+.map_btns {
+    width: 100%;
+    text-align: center;
+}
+
+.map_btns > button {
+    margin: 5px 10px !important;
+}
+
+.map_cameraid {
+    padding-left: 16px;
+    letter-spacing: 0.1em;
+}
+
+
+.map_search {
+    background-color: aliceblue;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.map_search > svg {
+    padding: 0 8px;
 }
