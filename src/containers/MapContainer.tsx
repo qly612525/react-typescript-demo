@@ -58,6 +58,19 @@ const styles = {
     }
 };
 
+interface cameraState {
+    id: string;
+    name: string;
+    address: string;
+    x: string;
+    y: string;
+    flag: boolean;
+}
+
+interface State {
+    cameraState?: cameraState;
+}
+
 interface Props {
     isOpen?: boolean;
     mapObject?: ol.Map;
@@ -68,14 +81,28 @@ interface Props {
     onEditEnd?: () => void;
 }
 
-class Map extends React.PureComponent<Props, {}> {
+class Map extends React.PureComponent<Props, State> {
+
+    private originState: cameraState;
+
     constructor(props: Props) {
         super(props);
+        this.state = {
+            cameraState: {
+                id: '',
+                name: '',
+                address: '',
+                flag: false,
+                x: '',
+                y: '',
+            }
+        };
         this.onFeatureClick = this.onFeatureClick.bind(this);
+        this.onCancleClick = this.onCancleClick.bind(this);
     }
 
     componentDidMount() { 
-        const { initMap, initFeatureLayer, mapObject,featureLayer } = this.props;
+        const { initMap, initFeatureLayer, mapObject, featureLayer } = this.props;
         // 初始化地图
         if (!mapObject) {
             initMap();
@@ -99,6 +126,19 @@ class Map extends React.PureComponent<Props, {}> {
         source.addFeatures(getTestMarker());
     }
 
+    onInputChange(input: any, classMeta: string): cameraState {
+        const { cameraState } = this.state;
+        const state = {
+            id: cameraState.id,
+            name: cameraState.name,
+            address: cameraState.address,
+            x: cameraState.x,
+            y: cameraState.y,
+            flag: cameraState.flag
+        };
+        return state;
+    }
+
     onFeatureMouseMove(evt: ol.MapBrowserEvent) { 
         
     }
@@ -109,7 +149,14 @@ class Map extends React.PureComponent<Props, {}> {
         const marker = catchMarker(pixel, mapObject);
         if (marker) {
             onEditStart();
+            this.originState = marker.get('cameraInfo');
+            this.setState({ cameraState: marker.get('cameraInfo') });
         }
+    }
+
+    onCancleClick() {
+        const cameraState = this.originState;
+        this.setState({ cameraState });
     }
 
     editView() { 
@@ -123,6 +170,7 @@ class Map extends React.PureComponent<Props, {}> {
     }
 
     render() {
+        const { cameraState } = this.state;
         const { isOpen, onEditEnd } = this.props;
         return (
             <div className="mapwrapper">
@@ -142,51 +190,73 @@ class Map extends React.PureComponent<Props, {}> {
                         title={<span style={styles.appbar.title}>视频编辑</span>}
                         iconElementLeft={<IconButton onClick={() => onEditEnd()}><NavigationClose /></IconButton>}
                     />
-                    <Subheader>摄像头编号</Subheader>
-                    <h2 className="map_cameraid">
-                        {'111222333444555666'}
-                    </h2>
-                    <List>
-                        <ListItem>
-                            <TextField
-                                hintText="名称"
-                                floatingLabelText="摄像头名称"
-                                fullWidth={true}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <TextField
-                                hintText="地址"
-                                floatingLabelText="摄像头地址"
-                                fullWidth={true}
-                                multiLine={true}
-                                rows={1}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <TextField
-                                hintText="经度"
-                                floatingLabelText="摄像头经度"
-                                style={{width: '45%'}}
-                            />
-                            <div style={styles.text.divder}>--</div>
-                            <TextField
-                                hintText="纬度"
-                                floatingLabelText="摄像头纬度"
-                                style={{ width: '45%' }}
-                            />
-                        </ListItem>
-                        <ListItem>
-                            <Toggle
-                                label="是否标记为重点"
-                                labelStyle={styles.toggle.label}
-                            />
-                        </ListItem>
-                    </List>
-                    <div className="map_btns">
-                        <FlatButton label="重置" secondary={true} />
-                        <RaisedButton label="提交" primary={true} />
-                    </div>
+                    <form action={'/test'} method="post">
+                        <Subheader>摄像头编号</Subheader>
+                        <h2 className="map_cameraid">
+                            {cameraState.id}
+                        </h2>
+                        <List>
+                            <ListItem>
+                                <TextField
+                                    hintText="名称"
+                                    floatingLabelText="摄像头名称"
+                                    fullWidth={true}
+                                    value={cameraState.name}
+                                    onChange={(event, val) => {
+                                        this.setState({ cameraState: { ...cameraState, name:val } })
+                                    }}
+                                />
+                            </ListItem>
+                            <ListItem>
+                                <TextField
+                                    hintText="地址"
+                                    floatingLabelText="摄像头地址"
+                                    fullWidth={true}
+                                    multiLine={true}
+                                    rows={1}
+                                    value={cameraState.address}
+                                    onChange={(event, val) => {
+                                        this.setState({ cameraState: { ...cameraState, address: val } })
+                                    }}
+                                />
+                            </ListItem>
+                            <ListItem>
+                                <TextField
+                                    hintText="经度"
+                                    floatingLabelText="摄像头经度"
+                                    style={{ width: '45%' }}
+                                    value={cameraState.x}
+                                    onChange={(event, val) => {
+                                        this.setState({ cameraState: { ...cameraState, x: val } })
+                                    }}
+                                />
+                                <div style={styles.text.divder}>--</div>
+                                <TextField
+                                    hintText="纬度"
+                                    floatingLabelText="摄像头纬度"
+                                    style={{ width: '45%' }}
+                                    value={cameraState.y}
+                                    onChange={(event, val) => {
+                                        this.setState({ cameraState: { ...cameraState, y: val } })
+                                    }}
+                                />
+                            </ListItem>
+                            <ListItem>
+                                <Toggle
+                                    label="是否标记为重点"
+                                    labelStyle={styles.toggle.label}
+                                    toggled={cameraState.flag}
+                                    onToggle={() => {
+                                        this.setState({cameraState: {...cameraState, flag: !cameraState.flag}})
+                                    }}
+                                />
+                            </ListItem>
+                        </List>
+                        <div className="map_btns">
+                            <FlatButton label="重置" secondary={true} onClick={this.onCancleClick} />
+                            <RaisedButton label="提交" primary={true} />
+                        </div>
+                    </form>
                 </Drawer>
             </div>
         );

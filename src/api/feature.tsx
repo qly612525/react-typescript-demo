@@ -53,6 +53,14 @@ export function getTestMarker(): ol.Feature[] {
     const mark = new ol.Feature({
         geometry: new ol.geom.Point([116, 40])
     });
+    mark.set('cameraInfo', {
+        id: '111222333444555666',
+        name: 'testname',
+        address: 'testaddress',
+        x: 0.1,
+        y: 0.1,
+        flag: false
+    });
     mark.setStyle(style);
     return [mark];
 }
