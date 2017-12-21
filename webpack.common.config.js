@@ -4,7 +4,7 @@ module.exports = {
         filename: "bundle.js",
         path: __dirname + "/dist"
     },
-    devtool: "source-map",
+    devtool: "inline-source-map",
     resolve: {
         extensions: [".ts", ".tsx",".js",".json"]
     },
