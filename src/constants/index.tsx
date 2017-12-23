@@ -15,3 +15,16 @@ export type START_EDIT = typeof START_EDIT;
 
 export const END_EDIT = "END_EDIT";
 export type END_EDIT = typeof END_EDIT;
+
+// 异步请求
+export const FETCH_NO = "FETCH_NO";
+export type FETCH_NO = typeof FETCH_NO;
+
+export const FETCH_REQUEST = "FETCH_REQUEST";
+export type FETCH_REQUEST = typeof FETCH_REQUEST;
+
+export const FETCH_SUCCESS = "FETCH_SUCCESS";
+export type FETCH_SUCCESS = typeof FETCH_SUCCESS;
+
+export const FETCH_ERROR = "FETCH_ERROR";
+export type FETCH_ERROR = typeof FETCH_ERROR;

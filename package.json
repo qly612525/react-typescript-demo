@@ -29,21 +29,24 @@
     "webpack-dev-server": "^2.9.7"
   },
   "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^0.17.1",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
     "css-loader": "^0.28.7",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "jade": "~1.11.0",
     "material-ui": "^0.20.0",
+    "morgan": "~1.9.0",
+    "mysql": "^2.15.0",
     "openlayers": "^4.6.4",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
-    "style-loader": "^0.19.1",
-    "body-parser": "~1.18.2",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.15.5",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.0",
+    "redux-thunk": "^2.2.0",
     "serve-favicon": "~2.4.5",
-    "mysql": "^2.15.0"
+    "style-loader": "^0.19.1"
   }
 }

@@ -6,6 +6,11 @@ export interface map {
     featureLayer: ol.layer.Vector;
 }
 
+export interface request {
+    status: string;
+}
+
 export interface StoreState {
     map: map;
+    request: request;
 }

@@ -1,5 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import * as React from 'react';
+import { bindActionCreators } from 'redux';
 
 import * as actions from '../actions';
 import { StoreState } from '../types';
@@ -21,6 +22,8 @@ import Subheader from 'material-ui/Subheader';
 
 import * as ol from 'openlayers';
 import { catchMarker, getTestMarker } from '../api/feature';
+
+import { ThunkAction } from 'redux-thunk';
 
 const menuProps = {
     desktop: true,
@@ -79,9 +82,14 @@ interface Props {
     initFeatureLayer?: () => ol.layer.Vector;
     onEditStart?: () => void;
     onEditEnd?: () => void;
+    thunkTestAction?: (time:number) => ThunkAction<Promise<string>, any, null>;
 }
 
-class Map extends React.PureComponent<Props, State> {
+interface Request {
+    status?: string;
+}
+
+class Map extends React.PureComponent<Props & Request, State> {
 
     private originState: cameraState;
 
@@ -99,6 +107,7 @@ class Map extends React.PureComponent<Props, State> {
         };
         this.onFeatureClick = this.onFeatureClick.bind(this);
         this.onCancleClick = this.onCancleClick.bind(this);
+        this.onFetch = this.onFetch.bind(this);
     }
 
     componentDidMount() { 
@@ -159,6 +168,11 @@ class Map extends React.PureComponent<Props, State> {
         this.setState({ cameraState });
     }
 
+    onFetch() {
+        const { thunkTestAction } = this.props;
+        thunkTestAction(2000);
+    }
+
     editView() { 
         const { isOpen } = this.props;
         if (isOpen) {
@@ -171,7 +185,14 @@ class Map extends React.PureComponent<Props, State> {
 
     render() {
         const { cameraState } = this.state;
-        const { isOpen, onEditEnd } = this.props;
+        const { isOpen, onEditEnd, status } = this.props;
+        let btnVal = '提交';
+        if (status === 'loading') {
+            btnVal = '...';
+        } else if (status === 'success') {
+            btnVal = '成功';
+        }
+
         return (
             <div className="mapwrapper">
                 <Paper className="map_search" zDepth={2} >
@@ -254,7 +275,7 @@ class Map extends React.PureComponent<Props, State> {
                         </List>
                         <div className="map_btns">
                             <FlatButton label="重置" secondary={true} onClick={this.onCancleClick} />
-                            <RaisedButton label="提交" primary={true} />
+                            <RaisedButton label={btnVal} primary={true} onClick={this.onFetch} />
                         </div>
                     </form>
                 </Drawer>
@@ -263,18 +284,19 @@ class Map extends React.PureComponent<Props, State> {
     }
 }
 
-function mapStateToProps({ map: { isOpen, mapObject, featureLayer }}: StoreState) {
+function mapStateToProps({ map: { isOpen, mapObject, featureLayer }, request: { status }}: StoreState) {
     return {
-        isOpen, mapObject, featureLayer
+        isOpen, mapObject, featureLayer, status
     };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<actions.EditAction>) {
+function mapDispatchToProps(dispatch: Dispatch<any>) {
     return {
         initMap: () => dispatch(actions.mapInit()),
         initFeatureLayer: () => dispatch(actions.featureLayerInit()),
         onEditStart: () => dispatch(actions.startEdit()),
         onEditEnd: () => dispatch(actions.endEdit()),
+        thunkTestAction: bindActionCreators(actions.thunkTestAction, dispatch),
     };
 }
 

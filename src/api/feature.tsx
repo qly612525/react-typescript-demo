@@ -46,14 +46,14 @@ export function catchMarker(pixel: ol.Pixel, map: ol.Map, metaClass: any = ol.Fe
  * @returns {ol.Feature[]} 
  */
 export function getTestMarker(): ol.Feature[] {
-    const icon = getIcon('/images/marker.png', [48, 48], [0.5, 1]);
-    const style = new ol.style.Style({
-        image: icon
+    const icon1 = getIcon('/images/marker.png', [48, 48], [0.5, 1]);
+    const style1 = new ol.style.Style({
+        image: icon1
     });
-    const mark = new ol.Feature({
+    const mark1 = new ol.Feature({
         geometry: new ol.geom.Point([116, 40])
     });
-    mark.set('cameraInfo', {
+    mark1.set('cameraInfo', {
         id: '111222333444555666',
         name: 'testname',
         address: 'testaddress',
@@ -61,6 +61,22 @@ export function getTestMarker(): ol.Feature[] {
         y: 0.1,
         flag: false
     });
-    mark.setStyle(style);
-    return [mark];
+    mark1.setStyle(style1);
+    const icon2 = getIcon('/images/marker.png', [48, 48], [0.5, 1]);
+    const style2 = new ol.style.Style({
+        image: icon2
+    });
+    const mark2 = new ol.Feature({
+        geometry: new ol.geom.Point([115, 40])
+    });
+    mark2.set('cameraInfo', {
+        id: '111222333444555999',
+        name: 'tee',
+        address: 'address',
+        x: 115.1,
+        y: 40.1,
+        flag: true
+    });
+    mark2.setStyle(style2);
+    return [mark1, mark2];
 }
