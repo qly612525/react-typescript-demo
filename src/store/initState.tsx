@@ -6,5 +6,6 @@ export default {
     },
     request: {
         status: 'no',
+        videos: [],
     }
 };

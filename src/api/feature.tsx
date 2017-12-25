@@ -1,4 +1,5 @@
 import * as ol from 'openlayers';
+import axios from 'axios';
 
 export function getIcon(src: string, size: ol.Size, anchor:number[]): ol.style.Icon {
     if(!src) throw new Error('图片地址不能为空！');
@@ -79,4 +80,34 @@ export function getTestMarker(): ol.Feature[] {
     });
     mark2.setStyle(style2);
     return [mark1, mark2];
+}
+
+export function getVideosData(): Promise<any> {
+    return axios.get('/video/list');
+}
+
+export function getMarker(info: any): ol.Feature {
+    let icon;
+    if (info['is_modify']) {
+        icon = getIcon('/images/marker_modify.png', [48, 48], [0.5, 1]);
+    } else {
+        icon = getIcon('/images/marker.png', [48, 48], [0.5, 1]);
+    }
+
+    const style = new ol.style.Style({
+        image: icon
+    });
+
+    const coords: ol.Coordinate = [parseFloat(info['o_x']), parseFloat(info['o_y'])] || [0, 0];
+
+    const mark = new ol.Feature({
+        geometry: new ol.geom.Point(coords)
+    });
+    mark.set('cameraInfo', info);
+    mark.setStyle(style);
+    return mark;
+}
+
+export function getVideos(list: Array<any>): ol.Feature[] {
+    return list.map((info) => getMarker(info));
 }

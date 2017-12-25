@@ -28,3 +28,13 @@ export type FETCH_SUCCESS = typeof FETCH_SUCCESS;
 
 export const FETCH_ERROR = "FETCH_ERROR";
 export type FETCH_ERROR = typeof FETCH_ERROR;
+
+// marker 异步
+export const VIDEO_FETCH_REQUEST = "VIDEO_FETCH_REQUEST";
+export type VIDEO_FETCH_REQUEST = typeof VIDEO_FETCH_REQUEST;
+
+export const VIDEO_FETCH_SUCCESS = "VIDEO_FETCH_SUCCESS";
+export type VIDEO_FETCH_SUCCESS = typeof VIDEO_FETCH_SUCCESS;
+
+export const VIDEO_FETCH_ERROR = "VIDEO_FETCH_ERROR";
+export type VIDEO_FETCH_ERROR = typeof VIDEO_FETCH_ERROR;

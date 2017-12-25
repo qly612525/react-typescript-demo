@@ -21,7 +21,7 @@ import Toggle from 'material-ui/Toggle';
 import Subheader from 'material-ui/Subheader';
 
 import * as ol from 'openlayers';
-import { catchMarker, getTestMarker } from '../api/feature';
+import { catchMarker, getTestMarker, getMarker } from '../api/feature';
 
 import { ThunkAction } from 'redux-thunk';
 
@@ -29,17 +29,6 @@ const menuProps = {
     desktop: true,
     disableAutoFocus: true,
 };
-
-const colors = [
-    'Red',
-    'Orange',
-    'Yellow',
-    'Green',
-    'Blue',
-    'Purple',
-    'Black',
-    'White',
-];
 
 const styles = {
     appbar: {
@@ -62,12 +51,13 @@ const styles = {
 };
 
 interface cameraState {
-    id: string;
+    did: string;
     name: string;
     address: string;
     x: string;
     y: string;
     flag: boolean;
+    isModify: boolean;
 }
 
 interface State {
@@ -78,11 +68,13 @@ interface Props {
     isOpen?: boolean;
     mapObject?: ol.Map;
     featureLayer?: ol.layer.Vector;
+    videos?: Array<ol.Feature>;
     initMap?: () => ol.Map;
     initFeatureLayer?: () => ol.layer.Vector;
     onEditStart?: () => void;
     onEditEnd?: () => void;
-    thunkTestAction?: (time:number) => ThunkAction<Promise<string>, any, null>;
+    thunkTestAction?: (time: number) => ThunkAction<Promise<string>, any, null>;
+    getVideosAction?: (s: ol.source.Vector) => ThunkAction<Promise<any>, any, null>;
 }
 
 interface Request {
@@ -92,15 +84,18 @@ interface Request {
 class Map extends React.PureComponent<Props & Request, State> {
 
     private originState: cameraState;
+    private isInit: boolean;
 
     constructor(props: Props) {
         super(props);
+        this.isInit = false;
         this.state = {
             cameraState: {
-                id: '',
+                did: '',
                 name: '',
                 address: '',
                 flag: false,
+                isModify: false,
                 x: '',
                 y: '',
             }
@@ -123,27 +118,33 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 
     componentWillUpdate() {
-        const { featureLayer, mapObject } = this.props;
+        const { featureLayer, mapObject, getVideosAction, videos } = this.props;
         if (!featureLayer) {
             this.forceUpdate();
             return;
         }
-        // 增加地图事件初始化过程
-        mapObject.on('click', this.onFeatureClick);
-        // 撒点到地图上
-        const source = featureLayer.getSource();
-        source.addFeatures(getTestMarker());
+        
+        if (featureLayer && !this.isInit) {
+            console.log("update");
+            const source = featureLayer.getSource();
+            // 获取数据
+            getVideosAction(source);
+            // 增加地图事件初始化过程
+            mapObject.on('click', this.onFeatureClick);
+            this.isInit = true;
+        }
     }
 
     onInputChange(input: any, classMeta: string): cameraState {
         const { cameraState } = this.state;
         const state = {
-            id: cameraState.id,
+            did: cameraState.did,
             name: cameraState.name,
             address: cameraState.address,
             x: cameraState.x,
             y: cameraState.y,
-            flag: cameraState.flag
+            flag: cameraState.flag,
+            isModify: cameraState.isModify
         };
         return state;
     }
@@ -158,8 +159,13 @@ class Map extends React.PureComponent<Props & Request, State> {
         const marker = catchMarker(pixel, mapObject);
         if (marker) {
             onEditStart();
-            this.originState = marker.get('cameraInfo');
-            this.setState({ cameraState: marker.get('cameraInfo') });
+            const info = { ...marker.get('cameraInfo') };
+            info['x'] = info['o_x'];
+            delete info['o_x'];
+            info['y'] = info['o_y'];
+            delete info['o_y'];
+            this.originState = info;
+            this.setState({ cameraState: info });
         }
     }
 
@@ -195,7 +201,7 @@ class Map extends React.PureComponent<Props & Request, State> {
 
         return (
             <div className="mapwrapper">
-                <Paper className="map_search" zDepth={2} >
+                {/* <Paper className="map_search" zDepth={2} >
                     <ActionSearch />
                     <AutoComplete
                         hintText="Search"
@@ -204,7 +210,7 @@ class Map extends React.PureComponent<Props & Request, State> {
                         underlineShow={false}
                     />
                     <ContentForward />
-                </Paper>  
+                </Paper>   */}
                 <div id="map" className="map"></div>
                 <Drawer width={350} openSecondary={true} open={isOpen}>
                     <AppBar
@@ -214,7 +220,7 @@ class Map extends React.PureComponent<Props & Request, State> {
                     <form action={'/test'} method="post">
                         <Subheader>摄像头编号</Subheader>
                         <h2 className="map_cameraid">
-                            {cameraState.id}
+                            {cameraState.did}
                         </h2>
                         <List>
                             <ListItem>
@@ -262,7 +268,7 @@ class Map extends React.PureComponent<Props & Request, State> {
                                     }}
                                 />
                             </ListItem>
-                            <ListItem>
+                            {/* <ListItem>
                                 <Toggle
                                     label="是否标记为重点"
                                     labelStyle={styles.toggle.label}
@@ -271,7 +277,7 @@ class Map extends React.PureComponent<Props & Request, State> {
                                         this.setState({cameraState: {...cameraState, flag: !cameraState.flag}})
                                     }}
                                 />
-                            </ListItem>
+                            </ListItem> */}
                         </List>
                         <div className="map_btns">
                             <FlatButton label="重置" secondary={true} onClick={this.onCancleClick} />
@@ -284,9 +290,9 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 }
 
-function mapStateToProps({ map: { isOpen, mapObject, featureLayer }, request: { status }}: StoreState) {
+function mapStateToProps({ map: { isOpen, mapObject, featureLayer }, request: { status, videos }}: StoreState) {
     return {
-        isOpen, mapObject, featureLayer, status
+        isOpen, mapObject, featureLayer, status, videos
     };
 }
 
@@ -297,6 +303,7 @@ function mapDispatchToProps(dispatch: Dispatch<any>) {
         onEditStart: () => dispatch(actions.startEdit()),
         onEditEnd: () => dispatch(actions.endEdit()),
         thunkTestAction: bindActionCreators(actions.thunkTestAction, dispatch),
+        getVideosAction: bindActionCreators(actions.videoFetch, dispatch),
     };
 }
 

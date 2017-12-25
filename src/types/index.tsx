@@ -8,6 +8,8 @@ export interface map {
 
 export interface request {
     status: string;
+    videos?: Array<any>;
+    error?: string;
 }
 
 export interface StoreState {
