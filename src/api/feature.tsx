@@ -87,27 +87,40 @@ export function getVideosData(): Promise<any> {
 }
 
 export function getMarker(info: any): ol.Feature {
-    let icon;
+    let icon, coords: ol.Coordinate;
+    const markerIcon = getIcon('/images/marker.png', [36, 36], [0.5, 1]);
+    const markerModifyIcon = getIcon('/images/marker_modify.png', [36, 36], [0.5, 1]);
+    const markerModifingIcon = getIcon('/images/marker_modifing.png', [36, 36], [0.5, 1]);
+
     if (info['is_modify']) {
-        icon = getIcon('/images/marker_modify.png', [48, 48], [0.5, 1]);
+        icon = markerModifyIcon;
+        coords = [parseFloat(info['n_x']), parseFloat(info['n_y'])];
     } else {
-        icon = getIcon('/images/marker.png', [48, 48], [0.5, 1]);
+        icon = markerIcon;
+        coords = [parseFloat(info['o_x']), parseFloat(info['o_y'])] || [0, 0];
     }
 
     const style = new ol.style.Style({
         image: icon
     });
 
-    const coords: ol.Coordinate = [parseFloat(info['o_x']), parseFloat(info['o_y'])] || [0, 0];
-
     const mark = new ol.Feature({
         geometry: new ol.geom.Point(coords)
     });
     mark.set('cameraInfo', info);
     mark.setStyle(style);
+    // marker存储icon对象
+    mark.set('markerIcon', markerIcon);
+    mark.set('markerModifyIcon', markerModifyIcon);
+    mark.set('markerModifingIcon', markerModifingIcon);
+
     return mark;
 }
 
 export function getVideos(list: Array<any>): ol.Feature[] {
     return list.map((info) => getMarker(info));
+}
+
+export function updateVideo(did:string, body: any): Promise<any> { 
+    return axios.post(`/video/${did}`, body);
 }

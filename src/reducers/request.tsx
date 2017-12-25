@@ -6,19 +6,19 @@ import initState from '../store/initState';
 export function requestReducer(state: request = initState.request, action:FetchAction): request {
     switch (action.type) {
         case constants.FETCH_NO:
-            return { ...state, status: 'no' };
+            return { ...state, editStatus: 'no' };
         case constants.FETCH_REQUEST:
-            return { ...state, status: 'loading' };
+            return { ...state, editStatus: 'loading' };
         case constants.FETCH_SUCCESS:
-            return { ...state, status: 'success' };
+            return { ...state, editStatus: 'success' };
         case constants.FETCH_ERROR:
-            return { ...state, status: 'error' };
+            return { ...state, editStatus: 'error' };
         case constants.VIDEO_FETCH_REQUEST:
             return { ...state };
         case constants.VIDEO_FETCH_SUCCESS:
-            return { ...state, videos: action.preload, status: 'success' };
+            return { ...state, videos: action.preload, editStatus: 'success' };
         case constants.VIDEO_FETCH_ERROR:
-            return { ...state, error: action.error, status: 'error' };    
+            return { ...state, error: action.error, editStatus: 'error' };    
     }
     return state;
 }

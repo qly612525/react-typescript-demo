@@ -39,7 +39,12 @@ const styles = {
     text: {
         divder: {
             display: 'inline-block',
-            width: '10%',
+            width: '4%',
+            textAlign: 'center'
+        },
+        btn: {
+            display: 'inline-block',
+            width: '16%',
             textAlign: 'center'
         }
     },
@@ -73,17 +78,20 @@ interface Props {
     initFeatureLayer?: () => ol.layer.Vector;
     onEditStart?: () => void;
     onEditEnd?: () => void;
-    thunkTestAction?: (time: number) => ThunkAction<Promise<string>, any, null>;
+    thunkTestAction?: (did: string, body: any) => ThunkAction<Promise<string>, any, null>;
     getVideosAction?: (s: ol.source.Vector) => ThunkAction<Promise<any>, any, null>;
 }
 
 interface Request {
-    status?: string;
+    editStatus?: string;
+    isModify?: boolean;
 }
 
 class Map extends React.PureComponent<Props & Request, State> {
 
     private originState: cameraState;
+    private translate: ol.interaction.Translate;
+    private mark: ol.Feature;
     private isInit: boolean;
 
     constructor(props: Props) {
@@ -101,11 +109,13 @@ class Map extends React.PureComponent<Props & Request, State> {
             }
         };
         this.onFeatureClick = this.onFeatureClick.bind(this);
+        this.onFeatureMouseMove = this.onFeatureMouseMove.bind(this);
+        this.onLoaction = this.onLoaction.bind(this);
         this.onCancleClick = this.onCancleClick.bind(this);
         this.onFetch = this.onFetch.bind(this);
     }
 
-    componentDidMount() { 
+    componentDidMount() {
         const { initMap, initFeatureLayer, mapObject, featureLayer } = this.props;
         // 初始化地图
         if (!mapObject) {
@@ -131,9 +141,22 @@ class Map extends React.PureComponent<Props & Request, State> {
             getVideosAction(source);
             // 增加地图事件初始化过程
             mapObject.on('click', this.onFeatureClick);
+            mapObject.on('pointerdrag', this.onFeatureMouseMove);
             this.isInit = true;
         }
     }
+
+    updateMarkerStatus() {
+        const { mapObject, isModify, onEditEnd } = this.props;
+        if (isModify) {
+            const translate = this.translate;
+            const marker = this.mark;
+            mapObject.removeInteraction(translate);
+            const style = new ol.style.Style({ image: marker.get('markerModifyIcon') });
+            marker.setStyle(style);
+            onEditEnd();
+        }
+     }
 
     onInputChange(input: any, classMeta: string): cameraState {
         const { cameraState } = this.state;
@@ -149,21 +172,64 @@ class Map extends React.PureComponent<Props & Request, State> {
         return state;
     }
 
-    onFeatureMouseMove(evt: ol.MapBrowserEvent) { 
-        
+    onLoaction() {
+        const marker = this.mark;
+        const { mapObject } = this.props;
+        const { cameraState } = this.state;
+        if (marker) {
+            const coords:ol.Coordinate = [parseFloat(cameraState.x), parseFloat(cameraState.y)];
+            (marker.getGeometry() as ol.geom.Point).setCoordinates(coords);
+            mapObject.renderSync();
+        }
+    }
+
+    onFeatureMouseMove(evt: ol.MapBrowserEvent) {
+        const { mapObject } = this.props;
+        const { cameraState } = this.state;
+        const pixel = evt.pixel;
+        const coords = evt.coordinate;
+        const marker = catchMarker(pixel, mapObject) as ol.Feature;
+        const viewport = mapObject.getViewport() as HTMLElement;
+        if (marker) {
+            viewport.style.cursor = 'pointer';
+        } else {
+            viewport.style.cursor = '';
+        }
+        // 更新坐标
+        this.setState({
+            cameraState:
+                { ...cameraState, x: coords[0].toString(), y: coords[1].toString() }
+        });
     }
 
     onFeatureClick(evt:ol.MapBrowserEvent) {
         const { mapObject, onEditStart } = this.props;
         const pixel = evt.pixel;
-        const marker = catchMarker(pixel, mapObject);
+        const marker = this.mark = catchMarker(pixel, mapObject) as ol.Feature;
         if (marker) {
+            // 打开drawer
             onEditStart();
+
             const info = { ...marker.get('cameraInfo') };
             info['x'] = info['o_x'];
             delete info['o_x'];
             info['y'] = info['o_y'];
             delete info['o_y'];
+
+            // 更改marker颜色，增加可拖拽交互
+            const style = new ol.style.Style({ image: marker.get('markerModifingIcon') });
+            marker.setStyle(style);
+            const collection: ol.Collection<ol.Feature> = new ol.Collection([marker]);
+            const translate = this.translate = new ol.interaction.Translate({
+                features: collection
+            });
+            mapObject.addInteraction(translate);
+
+            // 地图按照该修改点坐标，缩放到18级
+            const centerPoint = (marker.getGeometry() as ol.geom.Point).getCoordinates();
+            const view = mapObject.getView();
+            view.animate({ zoom: 18 , center: centerPoint, duration: 2000 });
+
             this.originState = info;
             this.setState({ cameraState: info });
         }
@@ -176,7 +242,9 @@ class Map extends React.PureComponent<Props & Request, State> {
 
     onFetch() {
         const { thunkTestAction } = this.props;
-        thunkTestAction(2000);
+        const { cameraState } = this.state;
+        const { did, name, address, x, y } = cameraState;
+        thunkTestAction(did, { name, address, x, y, updateTime: new Date(), isModify: true });
     }
 
     editView() { 
@@ -191,13 +259,9 @@ class Map extends React.PureComponent<Props & Request, State> {
 
     render() {
         const { cameraState } = this.state;
-        const { isOpen, onEditEnd, status } = this.props;
+        const { isOpen, onEditEnd, editStatus } = this.props;
         let btnVal = '提交';
-        if (status === 'loading') {
-            btnVal = '...';
-        } else if (status === 'success') {
-            btnVal = '成功';
-        }
+        this.updateMarkerStatus();
 
         return (
             <div className="mapwrapper">
@@ -251,22 +315,25 @@ class Map extends React.PureComponent<Props & Request, State> {
                                 <TextField
                                     hintText="经度"
                                     floatingLabelText="摄像头经度"
-                                    style={{ width: '45%' }}
+                                    style={{ width: '40%' }}
                                     value={cameraState.x}
                                     onChange={(event, val) => {
                                         this.setState({ cameraState: { ...cameraState, x: val } })
                                     }}
                                 />
-                                <div style={styles.text.divder}>--</div>
+                                <div style={styles.text.divder}>-</div>
                                 <TextField
                                     hintText="纬度"
                                     floatingLabelText="摄像头纬度"
-                                    style={{ width: '45%' }}
+                                    style={{ width: '40%' }}
                                     value={cameraState.y}
                                     onChange={(event, val) => {
                                         this.setState({ cameraState: { ...cameraState, y: val } })
                                     }}
                                 />
+                                <div style={styles.text.btn}>
+                                    <FlatButton label="定位" primary={true} onClick={this.onLoaction}/>
+                                </div>
                             </ListItem>
                             {/* <ListItem>
                                 <Toggle
@@ -290,9 +357,9 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 }
 
-function mapStateToProps({ map: { isOpen, mapObject, featureLayer }, request: { status, videos }}: StoreState) {
+function mapStateToProps({ map: { isOpen, mapObject, featureLayer }, request: { isModify, editStatus, videos }}: StoreState) {
     return {
-        isOpen, mapObject, featureLayer, status, videos
+        isOpen, mapObject, featureLayer, isModify, editStatus, videos
     };
 }
 

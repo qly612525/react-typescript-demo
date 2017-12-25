@@ -2,7 +2,7 @@ import * as constants from '../constants';
 import * as axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 import { Dispatch } from 'redux';
-import { getVideosData, getVideos } from '../api/feature';
+import { getVideosData, updateVideo, getVideos } from '../api/feature';
 import * as ol from 'openlayers';
 
 // 异步
@@ -23,17 +23,17 @@ export interface FetchError {
 }
 
 export type Fetch = FetchNo | FetchRequest | FetchSuccess | FetchError;
-type thunkTestAction = (time: number) => (dispatch: Dispatch<any>) => void;
-export const thunkTestActionFn:thunkTestAction = (time: number) => {
+type thunkTestAction = (did: string, body: any) => (dispatch: Dispatch<any>) => void;
+export const thunkTestActionFn:thunkTestAction = (did: string, body: any) => {
     return (dispatch: Dispatch<any>) => {
         dispatch({type: constants.FETCH_REQUEST});
-        try {
-            setTimeout(() => {
-                dispatch({ type: constants.FETCH_SUCCESS, preload: [1,2,3] });
-            }, time);
-        } catch (error) {
-            dispatch({ type: constants.FETCH_ERROR, preload: error.toString() });
-        }
+        updateVideo(did, body)
+            .then(response => {
+                dispatch({ type: constants.FETCH_SUCCESS, preload: response.data, isModify: true });
+            })
+            .catch(err => {
+                dispatch({ type: constants.FETCH_ERROR, error: err, isModify: true });
+            });
     }
 }
 
@@ -62,6 +62,7 @@ export const videoFetchFn: videoFetchAction = (source: ol.source.Vector) => {
             .then(response => {
                 const videos = getVideos(response.data);
                 source.addFeatures(videos);
+                source.changed();
                 dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos });
             })
             .catch(err => {

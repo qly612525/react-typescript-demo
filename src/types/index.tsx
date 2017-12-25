@@ -7,9 +7,11 @@ export interface map {
 }
 
 export interface request {
-    status: string;
+    editStatus: string;
     videos?: Array<any>;
+    proload?: string;
     error?: string;
+    isModify?: boolean;
 }
 
 export interface StoreState {

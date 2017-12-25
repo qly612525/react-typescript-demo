@@ -25,6 +25,8 @@ export function mapInit(): ol.Map {
         view: new ol.View({
             projection: 'EPSG:4326',
             center: [116, 39],
+            maxZoom: 18,
+            minZoom: 2,
             zoom: 5
         })
     });

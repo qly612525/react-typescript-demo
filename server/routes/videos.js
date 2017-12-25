@@ -12,6 +12,7 @@ conn.connect();
 // 查询字符串
 const getAll = 'SELECT * FROM v_devices;';
 const getCamera = 'SELECT * FROM v_devices where did=?;';
+const updateCameraNoFlag = 'UPDATE v_devices SET name=?,address=?,n_x=?,n_y=?,is_modify=1,update_time=? WHERE did=?;';
 const updateCoordByCameraId = 'UPDATE v_devices SET n_x=?,n_y=? WHERE did=?;';
 const updateNameByCameraId = 'UPDATE v_devices SET name=? WHERE did=?;';
 const updateAddressByCameraId = 'UPDATE v_devices SET address=? WHERE did=?;';
@@ -31,6 +32,15 @@ router.get('/:cameraid', function (req, res, next) {
     conn.query(getCamera, [cameraid.toString()], function (err, rows, fields) {
         if (err) throw err;
         res.json({status: 'OK', rows: rows});
+    });
+});
+
+router.post('/:cameraid', function (req, res, next) {
+    const cameraid = req.params.cameraid || 0;
+    const { name, address, x, y, updateTime } = req.body;
+    conn.query(updateCameraNoFlag, [name, address, parseFloat(x), parseFloat(y), updateTime.toString(), cameraid.toString()], function (err, rows, fields) {
+        if (err) throw err;
+        res.json({ status: 'OK', rows: rows });
     });
 });
 

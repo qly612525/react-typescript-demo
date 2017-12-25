@@ -5,7 +5,8 @@ export default {
         featureLayer: null,
     },
     request: {
-        status: 'no',
+        editStatus: 'no',
         videos: [],
+        isModify: false,
     }
 };
