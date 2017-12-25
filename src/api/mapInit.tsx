@@ -11,12 +11,14 @@ export function mapInit(): ol.Map {
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
-                    url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}"
+                    url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}",
+                    // projection: 'EPSG:4326'
                 })
             }),
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
-                    url: "http://t2.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}"
+                    url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}",
+                    // projection: 'EPSG:4326'
                 })
             })
         ],

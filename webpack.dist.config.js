@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const config = require('./webpack.common.config');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 delete config.devtool;
 config.plugins = [
