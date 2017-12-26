@@ -78,7 +78,7 @@ interface Props {
     initFeatureLayer?: () => ol.layer.Vector;
     onEditStart?: () => void;
     onEditEnd?: () => void;
-    thunkTestAction?: (did: string, body: any) => ThunkAction<Promise<string>, any, null>;
+    thunkTestAction?: (did: string, body: any, marker: ol.Feature, map: ol.Map) => ThunkAction<Promise<string>, any, null>;
     getVideosAction?: (s: ol.source.Vector, map: ol.Map) => ThunkAction<Promise<any>, any, null>;
 }
 
@@ -90,7 +90,7 @@ interface Request {
 class Map extends React.PureComponent<Props & Request, State> {
 
     private originState: cameraState;
-    private translate: ol.interaction.Translate;
+    private collection: ol.Collection<ol.Feature>;
     private mark: ol.Feature;
     private isInit: boolean;
 
@@ -140,10 +140,16 @@ class Map extends React.PureComponent<Props & Request, State> {
             const source = featureLayer.getSource();
             // 获取数据
             getVideosAction(source, mapObject);
+            // 构建可拖拽交互
+            const collection: ol.Collection<ol.Feature> = this.collection= new ol.Collection();
+            const translate = new ol.interaction.Translate({
+                features: collection
+            });
+            mapObject.addInteraction(translate);
             // 增加地图事件初始化过程
             mapObject.on('click', this.onFeatureClick);
             mapObject.on('pointermove', this.onFeatureMouseMove);
-            mapObject.on('pointerdrag', this.onFeatureDrag);
+            // mapObject.on('pointerdrag', this.onFeatureDrag);
             this.isInit = true;
         }
     }
@@ -151,9 +157,9 @@ class Map extends React.PureComponent<Props & Request, State> {
     updateMarkerStatus() {
         const { mapObject, isModify, onEditEnd } = this.props;
         if (isModify) {
-            const translate = this.translate;
+            const collection: ol.Collection<ol.Feature> = this.collection;
             const marker = this.mark;
-            mapObject.removeInteraction(translate);
+            collection.clear();
             const style = new ol.style.Style({ image: marker.get('markerModifyIcon') });
             marker.setStyle(style);
             onEditEnd();
@@ -185,20 +191,6 @@ class Map extends React.PureComponent<Props & Request, State> {
         }
     }
 
-    onFeatureDrag(evt: ol.MapBrowserEvent) {
-        const { mapObject } = this.props;
-        const { cameraState } = this.state;
-        const pixel = evt.pixel;
-        const coords = evt.coordinate;
-        const marker = catchMarker(pixel, mapObject) as ol.Feature;
-        const viewport = mapObject.getViewport() as HTMLElement;
-        if (marker) {
-            viewport.style.cursor = 'pointer';
-        } else {
-            viewport.style.cursor = '';
-        }
-    }
-
     onFeatureMouseMove(evt: ol.MapBrowserEvent) {
         const { mapObject } = this.props;
         const { cameraState } = this.state;
@@ -208,10 +200,27 @@ class Map extends React.PureComponent<Props & Request, State> {
         const viewport = mapObject.getViewport() as HTMLElement;
         if (marker) {
             viewport.style.cursor = 'pointer';
-            // 更新marker位置
-            (marker.getGeometry() as ol.geom.Point).setCoordinates(coords);
-            marker.changed();
             // 更新坐标
+            const coords: ol.Coordinate = (marker.getGeometry() as ol.geom.Point).getCoordinates();
+            this.setState({
+                cameraState:
+                    { ...cameraState, x: coords[0].toString(), y: coords[1].toString() }
+            });
+        } else {
+            viewport.style.cursor = '';
+        }
+    }
+
+    onFeatureDrag(evt: ol.MapBrowserEvent) {
+        const { mapObject } = this.props;
+        const { cameraState } = this.state;
+        const pixel = evt.pixel;
+        const marker = catchMarker(pixel, mapObject) as ol.Feature;
+        const viewport = mapObject.getViewport() as HTMLElement;
+        if (marker) {
+            viewport.style.cursor = 'pointer';
+            // 更新坐标
+            const coords: ol.Coordinate = (marker.getGeometry() as ol.geom.Point).getCoordinates();
             this.setState({
                 cameraState:
                     { ...cameraState, x: coords[0].toString(), y: coords[1].toString() }
@@ -238,12 +247,11 @@ class Map extends React.PureComponent<Props & Request, State> {
             // 更改marker颜色，增加可拖拽交互
             const style = new ol.style.Style({ image: marker.get('markerModifingIcon') });
             marker.setStyle(style);
-            const collection: ol.Collection<ol.Feature> = new ol.Collection([marker]);
-            const translate = this.translate = new ol.interaction.Translate({
-                features: collection
-            });
-            mapObject.addInteraction(translate);
 
+            // 添加到可拖拽集合中
+            const collection: ol.Collection<ol.Feature> = this.collection;
+            collection.push(marker);
+            
             // 地图按照该修改点坐标，缩放到18级
             const centerPoint = (marker.getGeometry() as ol.geom.Point).getCoordinates();
             const view = mapObject.getView();
@@ -260,10 +268,11 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 
     onFetch() {
-        const { thunkTestAction, onEditEnd } = this.props;
+        const { thunkTestAction, onEditEnd, mapObject } = this.props;
         const { cameraState } = this.state;
+        const marker = this.mark;
         const { did, name, address, x, y } = cameraState;
-        thunkTestAction(did, { name, address, x, y, updateTime: new Date(), isModify: true });
+        thunkTestAction(did, { name, address, x, y, updateTime: new Date(), isModify: true }, marker, mapObject);
         onEditEnd();
     }
 
