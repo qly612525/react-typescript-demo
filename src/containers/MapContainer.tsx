@@ -79,7 +79,7 @@ interface Props {
     onEditStart?: () => void;
     onEditEnd?: () => void;
     thunkTestAction?: (did: string, body: any) => ThunkAction<Promise<string>, any, null>;
-    getVideosAction?: (s: ol.source.Vector) => ThunkAction<Promise<any>, any, null>;
+    getVideosAction?: (s: ol.source.Vector, map: ol.Map) => ThunkAction<Promise<any>, any, null>;
 }
 
 interface Request {
@@ -110,6 +110,7 @@ class Map extends React.PureComponent<Props & Request, State> {
         };
         this.onFeatureClick = this.onFeatureClick.bind(this);
         this.onFeatureMouseMove = this.onFeatureMouseMove.bind(this);
+        // this.onFeatureDrag = this.onFeatureDrag.bind(this);
         this.onLoaction = this.onLoaction.bind(this);
         this.onCancleClick = this.onCancleClick.bind(this);
         this.onFetch = this.onFetch.bind(this);
@@ -138,10 +139,11 @@ class Map extends React.PureComponent<Props & Request, State> {
             console.log("update");
             const source = featureLayer.getSource();
             // 获取数据
-            getVideosAction(source);
+            getVideosAction(source, mapObject);
             // 增加地图事件初始化过程
             mapObject.on('click', this.onFeatureClick);
-            mapObject.on('pointerdrag', this.onFeatureMouseMove);
+            mapObject.on('pointermove', this.onFeatureMouseMove);
+            mapObject.on('pointerdrag', this.onFeatureDrag);
             this.isInit = true;
         }
     }
@@ -183,7 +185,7 @@ class Map extends React.PureComponent<Props & Request, State> {
         }
     }
 
-    onFeatureMouseMove(evt: ol.MapBrowserEvent) {
+    onFeatureDrag(evt: ol.MapBrowserEvent) {
         const { mapObject } = this.props;
         const { cameraState } = this.state;
         const pixel = evt.pixel;
@@ -195,11 +197,28 @@ class Map extends React.PureComponent<Props & Request, State> {
         } else {
             viewport.style.cursor = '';
         }
-        // 更新坐标
-        this.setState({
-            cameraState:
-                { ...cameraState, x: coords[0].toString(), y: coords[1].toString() }
-        });
+    }
+
+    onFeatureMouseMove(evt: ol.MapBrowserEvent) {
+        const { mapObject } = this.props;
+        const { cameraState } = this.state;
+        const pixel = evt.pixel;
+        const coords = evt.coordinate;
+        const marker = catchMarker(pixel, mapObject) as ol.Feature;
+        const viewport = mapObject.getViewport() as HTMLElement;
+        if (marker) {
+            viewport.style.cursor = 'pointer';
+            // 更新marker位置
+            (marker.getGeometry() as ol.geom.Point).setCoordinates(coords);
+            marker.changed();
+            // 更新坐标
+            this.setState({
+                cameraState:
+                    { ...cameraState, x: coords[0].toString(), y: coords[1].toString() }
+            });
+        } else {
+            viewport.style.cursor = '';
+        }
     }
 
     onFeatureClick(evt:ol.MapBrowserEvent) {

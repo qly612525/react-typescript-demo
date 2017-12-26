@@ -53,16 +53,16 @@ export interface VideoFetchError {
 }
 
 export type VideoFetch = VideoFetchRequest | VideoFetchSuccess | VideoFetchError;
-type videoFetchAction = (source: ol.source.Vector) => (dispatch: Dispatch<any>) => void;
+type videoFetchAction = (source: ol.source.Vector, map: ol.Map) => (dispatch: Dispatch<any>) => void;
 
-export const videoFetchFn: videoFetchAction = (source: ol.source.Vector) => {
+export const videoFetchFn: videoFetchAction = (source: ol.source.Vector, map: ol.Map) => {
     return (dispatch: Dispatch<any>) => {
         dispatch({ type: constants.VIDEO_FETCH_REQUEST });
         getVideosData()
             .then(response => {
                 const videos = getVideos(response.data);
                 source.addFeatures(videos);
-                source.changed();
+                map.render();
                 dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos });
             })
             .catch(err => {
