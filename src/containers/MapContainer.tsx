@@ -260,10 +260,11 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 
     onFetch() {
-        const { thunkTestAction } = this.props;
+        const { thunkTestAction, onEditEnd } = this.props;
         const { cameraState } = this.state;
         const { did, name, address, x, y } = cameraState;
         thunkTestAction(did, { name, address, x, y, updateTime: new Date(), isModify: true });
+        onEditEnd();
     }
 
     editView() { 
