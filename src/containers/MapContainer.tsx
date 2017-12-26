@@ -91,7 +91,7 @@ class Map extends React.PureComponent<Props & Request, State> {
 
     private originState: cameraState;
     private collection: ol.Collection<ol.Feature>;
-    private mark: ol.Feature;
+    private mark: ol.Feature = null;
     private isInit: boolean;
 
     constructor(props: Props) {
@@ -231,10 +231,11 @@ class Map extends React.PureComponent<Props & Request, State> {
     }
 
     onFeatureClick(evt:ol.MapBrowserEvent) {
-        const { mapObject, onEditStart } = this.props;
+        const { mapObject, onEditStart, isOpen } = this.props;
         const pixel = evt.pixel;
-        const marker = this.mark = catchMarker(pixel, mapObject) as ol.Feature;
+        const marker = catchMarker(pixel, mapObject) as ol.Feature;
         if (marker) {
+            if (this.mark) return;
             // 打开drawer
             onEditStart();
 
@@ -259,6 +260,8 @@ class Map extends React.PureComponent<Props & Request, State> {
 
             this.originState = info;
             this.setState({ cameraState: info });
+
+            this.mark = marker;
         }
     }
 
@@ -274,6 +277,7 @@ class Map extends React.PureComponent<Props & Request, State> {
         const { did, name, address, x, y } = cameraState;
         thunkTestAction(did, { name, address, x, y, updateTime: new Date(), isModify: true }, marker, mapObject);
         onEditEnd();
+        this.mark = null;
     }
 
     editView() { 
