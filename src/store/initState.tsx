@@ -1,12 +1,12 @@
+import * as ol from 'openlayers';
+
 export default {
     map: {
-        isOpen: false,
         mapObject: null,
-        featureLayer: null,
+        source: null,
+        collection: new ol.Collection() as ol.Collection<ol.Feature>,
     },
     request: {
-        editStatus: 'no',
-        videos: [],
-        isModify: false,
+        videos: null,
     }
 };

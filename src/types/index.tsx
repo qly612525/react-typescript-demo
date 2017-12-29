@@ -1,17 +1,17 @@
 import * as ol from 'openlayers';
 
 export interface map {
-    isOpen: boolean;
     mapObject: ol.Map;
-    featureLayer: ol.layer.Vector;
+    source: ol.source.Vector;
+    collection: ol.Collection<ol.Feature>;
 }
 
 export interface request {
-    editStatus: string;
+    // editStatus: string;
     videos?: Array<any>;
-    proload?: string;
+    // proload?: string;
     error?: string;
-    isModify?: boolean;
+    // isModify?: boolean;
 }
 
 export interface StoreState {

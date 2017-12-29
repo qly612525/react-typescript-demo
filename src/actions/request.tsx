@@ -58,20 +58,23 @@ export interface VideoFetchError {
 }
 
 export type VideoFetch = VideoFetchRequest | VideoFetchSuccess | VideoFetchError;
-type videoFetchAction = (source: ol.source.Vector, map: ol.Map) => (dispatch: Dispatch<any>) => void;
+type videoFetchAction = (source: ol.source.Vector, map: ol.Map, collection: ol.Collection<ol.Feature>) => (dispatch: Dispatch<any>) => void;
 
-export const videoFetchFn: videoFetchAction = (source: ol.source.Vector, map: ol.Map) => {
+export const videoFetchFn: videoFetchAction = (source: ol.source.Vector, map: ol.Map, collection: ol.Collection<ol.Feature>) => {
     return (dispatch: Dispatch<any>) => {
         dispatch({ type: constants.VIDEO_FETCH_REQUEST });
-        getVideosData()
-            .then(response => {
-                const videos = getVideos(response.data);
-                source.addFeatures(videos);
-                map.render();
-                dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos });
-            })
-            .catch(err => {
-                dispatch({ type: constants.VIDEO_FETCH_ERROR, error: err.toString() });
-            });
+        setTimeout(() => {
+            const response = {
+                data: [
+                    { id: '1', name: '1', address: '1', o_x: '116.56', o_y: '39.5', is_modify: false },         
+                    { id: '2', name: '2', address: '2', o_x: '116.86', o_y: '39.5', is_modify: false }
+                ]
+            };
+            const videos = getVideos(response.data);
+            source.addFeatures(videos);
+            collection.push(videos[0]);
+            map.render();
+            dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos });
+        },2000);
     }
 }
