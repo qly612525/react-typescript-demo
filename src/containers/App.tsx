@@ -55,8 +55,8 @@ class App extends React.Component<any, any> {
 
 }
 
-function mapStateToProps({map: {mapObject, source, collection}, request: {videos}}:StoreState) {
-    return { mapObject, source, collection, videos };
+function mapStateToProps({video: {current, videos}}:StoreState) {
+    return { current, videos };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>) { 

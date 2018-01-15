@@ -1,6 +1,6 @@
 // import { mapInitFn, featureLayerInitFn, startEditFn, endEditFn, MapInit, FeatureLayerInit, StartEdit, EndEdit } from './mapactions';
-import { Fetch, VideoFetch, thunkTestActionFn, videoFetchFn } from './request';
 import { MapInit, initializeFn, getVideosFn } from './map';
+import { VideoFetch, videoFetchFn } from './videos';
 
 // export type EditAction = MapInit | FeatureLayerInit | StartEdit | EndEdit;
 
@@ -9,8 +9,7 @@ import { MapInit, initializeFn, getVideosFn } from './map';
 // export const startEdit = startEditFn;
 // export const endEdit = endEditFn;
 
-export type FetchAction = Fetch | VideoFetch;
-export const thunkTestAction = thunkTestActionFn;
+export type FetchAction = VideoFetch;
 export const videoFetch = videoFetchFn;
 
 export type MapActions = MapInit;

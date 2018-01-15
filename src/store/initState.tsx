@@ -6,7 +6,8 @@ export default {
         source: null,
         collection: new ol.Collection() as ol.Collection<ol.Feature>,
     },
-    request: {
+    video: {
         videos: null,
+        current: null,
     }
 };

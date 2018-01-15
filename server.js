@@ -40,6 +40,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/video', videos);
+app.use('/margins', margins);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

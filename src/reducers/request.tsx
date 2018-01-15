@@ -1,9 +1,9 @@
 import { FetchAction } from '../actions';
-import { request } from '../types';
+import { video } from '../types';
 import * as constants from '../constants';
 import initState from '../store/initState';
 
-export function requestReducer(state: request = initState.request, action:FetchAction): request {
+export function requestReducer(state: video = initState.video, action:FetchAction): video {
     switch (action.type) {
         case constants.VIDEO_FETCH_REQUEST:
             return { ...state };
