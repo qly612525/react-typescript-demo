@@ -25,7 +25,8 @@ export const videoFetchFn: videoFetchAction = () => {
     return (dispatch: Dispatch<any>) => {
         dispatch({ type: constants.VIDEO_FETCH_REQUEST });
         getMarginVideos()
-            .then((videos: any) => dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos.data })).catch((err) => dispatch({ type: constants.VIDEO_FETCH_ERROR, preload: err }));
+            .then((videos: any) => dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos.data }))
+            .catch((err) => dispatch({ type: constants.VIDEO_FETCH_ERROR, preload: err }));
         // setTimeout(() => { 
         //     const videos = [
         //         {

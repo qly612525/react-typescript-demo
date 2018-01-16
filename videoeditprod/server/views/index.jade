@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  h2 修改坐标
+  form(action="/video/41128100001310029374/coordinates", method="post")
+    div
+      input(type="text", name="long")
+      input(type="text", name="lat")
+    button(type="submit") 提交
+
+  br
+
+  h2 修改名称
+  form(action="/video/41128100001310029374/name", method="post")
+    div
+      input(type="text", name="name")
+    button(type="submit") 提交
+
+  br
+  
+  h2 修改地址
+  form(action="/video/41128100001310029374/address", method="post")
+    div
+      input(type="text", name="address")
+    button(type="submit") 提交
+
+  br
+
+  h2 修改标签
+  form(action="/video/41128100001310029374/flag", method="post")
+    div
+      input(type="text", name="flag")
+    button(type="submit") 提交

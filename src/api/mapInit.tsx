@@ -47,18 +47,18 @@ export function initialize() {
         interactions: ol.interaction.defaults().extend([translate]),
         target: 'map',
         layers: [
-            // new ol.layer.Tile({
-            //     source: new ol.source.XYZ({
-            //         url: "http://41.188.33.196:8080/PGIS_S_TileMapServer/Maps/GDDH/EzMap?Service=getImage&Type=RGB&ZoomOffset=0&Col={x}&Row={y}&Zoom={z}&V=0.3&key=",
-            //         projection: 'EPSG:4326'
-            //     })
-            // })
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
-                    url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}",
-                    // projection: 'EPSG:4326'
+                    url: "http://41.188.33.196:8080/PGIS_S_TileMapServer/Maps/GDDH/EzMap?Service=getImage&Type=RGB&ZoomOffset=0&Col={x}&Row={y}&Zoom={z}&V=0.3&key=",
+                    projection: 'EPSG:4326'
                 })
             }),
+            // new ol.layer.Tile({
+            //     source: new ol.source.XYZ({
+            //         url: "http://t2.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}",
+            //         // projection: 'EPSG:4326'
+            //     })
+            // }),
             new ol.layer.Vector({
                 source: source
             })
