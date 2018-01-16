@@ -9,20 +9,9 @@ import { getMarker } from '../api/feature';
 
 class Map extends React.Component<any, any> {
 
-    private _init: boolean = true;
-
-    shouldComponentUpdate() {
-        if (this._init) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     componentDidMount() {
         const { initialize } = this.props;
         initialize();
-        this._init = false;
     }
 
     render() {

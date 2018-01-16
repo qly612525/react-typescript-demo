@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+// import { routerReducer } from 'react-router-redux';
 import { mapReducer } from './map';
 import { requestReducer } from './request';
 

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect, Dispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import {
     Table,
@@ -48,15 +47,16 @@ class VideoList extends React.Component<any, any> {
                 <TableRowColumn>{marker.type}</TableRowColumn>
                 <TableRowColumn>{marker.x}</TableRowColumn>
                 <TableRowColumn>{marker.y}</TableRowColumn>
-                <TableRowColumn><Link to="/map"><RaisedButton onClick={this.onEditClick(i)} label="编辑" primary={true} /></Link></TableRowColumn>
+                <TableRowColumn><RaisedButton onClick={this.onEditClick(i)} label="编辑" primary={true} /></TableRowColumn>
             </TableRow>
         );
     }
 
     onEditClick(num: number) {
-        const { setCurrent } = this.props;
+        const { setCurrent, history } = this.props;
         return () => {
             setCurrent(num);
+            history.push('/map');
         }
     }
 
@@ -102,7 +102,7 @@ function mapStateToProps({ video: { current, videos } }: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<any>) {
     return {
         setCurrent: (num:number) => dispatch(actions.setCurrent(num)),
-        getVideos: bindActionCreators(actions.videoFetch, dispatch)
+        getVideos: bindActionCreators(actions.videoFetch, dispatch),
     };
 }
 

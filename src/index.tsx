@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Provider } from 'react-redux';
-import { HashRouter, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import App from './containers/App';
@@ -12,12 +12,12 @@ const store = configureStore();
 ReactDom.render(
     <Provider store={store}>
         <MuiThemeProvider>
-            <HashRouter>
-                <div className="route-container">
+            <Router>
+                <Switch>
                     <Route exact path="/" component={VideoList} />
-                    <Route path="/map" component={App} />
-                </div>
-            </HashRouter>
+                    <Route exact path="/map" component={App} />
+                </Switch>
+            </Router>
         </MuiThemeProvider>
     </Provider>
     ,

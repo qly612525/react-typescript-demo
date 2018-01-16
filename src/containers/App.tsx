@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect, Dispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 import * as ol from 'openlayers';
 
 import Map from './Map';
@@ -52,9 +51,11 @@ class App extends React.Component<any, any> {
         // this.onFeatureClick = this.onFeatureClick.bind(this);
     }
 
-    // componentDidMount() {
-    //     this.addFeature();
-    // }
+    componentDidMount() {
+        setTimeout(() => { 
+            this.addFeature();
+        },1000);
+    }
 
     addFeature() {
         const { mapObject, source, collection, videos, current } = this.props;
@@ -66,32 +67,31 @@ class App extends React.Component<any, any> {
             geom.on('change', this.onGeomChange);
             const [x, y] = geom.getCoordinates();
             const view = mapObject.getView();
-            view.setCenter([x, y]);
-            this.setState({ x, y });
+            view.animate({ zoom: 18 }, { center: [x, y] }, { duration: 3000 });
             source.addFeature(mark);
             collection.push(mark);
-            mapObject.render();
             this._init = false;
+            this.setState({ x, y });
         }
     }
 
     onGeomChange(evt: any) {
         const [x, y] = evt.target.getCoordinates();
         this.setState({ x, y });
-        console.log("geom change" + evt);
     }
 
     onReturn() {
-        const { clearVideos, source, collection } = this.props;
+        const { clearVideos, source, collection, history } = this.props;
         clearVideos();
         source.clear();
         collection.clear();
         this._mark.un('change', this.onGeomChange);
         this._mark = null;
+        history.push('/');
     }
 
     onSubmit() {
-        const { clearVideos, source, collection, updateVideo, videos, current } = this.props;
+        const { clearVideos, source, collection, updateVideo, videos, current, history } = this.props;
         const { x, y } = this.state;
         const info = { ...videos[current], x, y };
         updateVideo(info);
@@ -100,11 +100,12 @@ class App extends React.Component<any, any> {
         collection.clear();
         this._mark.un('change', this.onGeomChange);
         this._mark = null;
+        history.push('/');
     }
 
     render() {
-        this.addFeature();
-        const { videos, current } = this.props;
+        const { videos, current, history } = this.props;
+        if (videos === null || current === null) history.push('/');
         const video = videos[current];
         return (
             <div className="mapwrapper">
@@ -134,8 +135,8 @@ class App extends React.Component<any, any> {
                         </ListItem>
                     </List>
                     <div className="map_btns">
-                        <Link to='/' onClick={this.onReturn}><FlatButton label="返回" secondary={true} /></Link>
-                        <Link to='/' onClick={this.onSubmit}><RaisedButton label="提交" primary={true} /></Link>
+                        <FlatButton onClick={this.onReturn} label="返回" secondary={true} />
+                        <RaisedButton onClick={this.onSubmit} label="提交" primary={true} />
                     </div>
                 </Drawer>    
             </div>

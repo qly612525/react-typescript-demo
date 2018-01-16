@@ -41,7 +41,7 @@ export const videoFetchFn: videoFetchAction = () => {
         //         }
         //     ];
         //     dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: videos });
-        // }, 2000);
+        // }, 500);
     }
 }
 
@@ -66,7 +66,7 @@ export const videoUpdateFn: videoUpdateAction = (info:any) => {
     return (dispatch: Dispatch<any>) => {
         dispatch({ type: constants.VIDEO_UPDATE_REQUEST });
         updateMarginVideo(info)
-            .then((result: any) => dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: result.data }))
+            .then((result: any) => dispatch({ type: constants.VIDEO_FETCH_SUCCESS, preload: null }))
             .catch((err) => dispatch({ type: constants.VIDEO_FETCH_ERROR, preload: err }));
     }
 }

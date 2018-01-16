@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: '视频' });
 });
 
+router.get('/map', function(req, res, next) {
+  res.redirect('/');
+});
+
 module.exports = router;
