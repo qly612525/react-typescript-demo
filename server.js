@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 var index = require('./server/routes/index');
 var users = require('./server/routes/users');
 var videos = require('./server/routes/videos');
+var margins = require('./server/routes/margins');
 
 // 配置日志路径
 var logDirectory = __dirname + '/logs';

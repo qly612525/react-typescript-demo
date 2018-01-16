@@ -15,6 +15,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import { StoreState } from '../types';
 import * as actions from '../actions';
+import { getVideos } from '../api/feature';
 
 class VideoList extends React.Component<any, any> {
 
@@ -22,20 +23,17 @@ class VideoList extends React.Component<any, any> {
         super(props);
     }
 
+    update() {
+        const { videos, getVideos } = this.props;
+        if (!videos) {
+            getVideos();
+        }
+    }
+
     getList() {
-        const markes = [
-            {
-                id: 1,
-                department_1: "ttt",
-                department_2: "tyty",
-                category: "中朝边界",
-                name: "与欧冠",
-                type: "云台",
-                x: 116,
-                y: 39
-            }
-        ];
-        const uis = markes.map((m,i) => this.createRow(m,i));
+        const { videos } = this.props; 
+        if (!videos) return null;
+        const uis = videos.map((m: any, i: number) => this.createRow(m, i));
         return uis;
     }
 
@@ -50,12 +48,20 @@ class VideoList extends React.Component<any, any> {
                 <TableRowColumn>{marker.type}</TableRowColumn>
                 <TableRowColumn>{marker.x}</TableRowColumn>
                 <TableRowColumn>{marker.y}</TableRowColumn>
-                <TableRowColumn><Link to="/map"><RaisedButton label="编辑" primary={true} /></Link></TableRowColumn>
+                <TableRowColumn><Link to="/map"><RaisedButton onClick={this.onEditClick(i)} label="编辑" primary={true} /></Link></TableRowColumn>
             </TableRow>
         );
     }
 
+    onEditClick(num: number) {
+        const { setCurrent } = this.props;
+        return () => {
+            setCurrent(num);
+        }
+    }
+
     render() {
+        this.update();
         return (
             <Table
                 fixedHeader={true}
@@ -89,12 +95,13 @@ class VideoList extends React.Component<any, any> {
 
 }
 
-function mapStateToProps({  }: any) {
-    return { };
+function mapStateToProps({ video: { current, videos } }: StoreState) {
+    return { current, videos };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<any>) {
     return {
+        setCurrent: (num:number) => dispatch(actions.setCurrent(num)),
         getVideos: bindActionCreators(actions.videoFetch, dispatch)
     };
 }
@@ -103,5 +110,4 @@ function mergeProps(stateProps: any, dispatchProps: any, ownProps: any) {
     return Object.assign({}, ownProps, stateProps, dispatchProps);
 }
 
-// export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(VideoList);
-export default VideoList;
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(VideoList);

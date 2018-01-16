@@ -29,6 +29,14 @@ export type FETCH_SUCCESS = typeof FETCH_SUCCESS;
 export const FETCH_ERROR = "FETCH_ERROR";
 export type FETCH_ERROR = typeof FETCH_ERROR;
 
+// current
+export const VIDEO_SET_CURRENT = "VIDEO_SET_CURRENT";
+export type VIDEO_SET_CURRENT = typeof VIDEO_SET_CURRENT;
+
+// video clear
+export const VIDEO_CLEAR = "VIDEO_CLEAR";
+export type VIDEO_CLEAR = typeof VIDEO_CLEAR;
+
 // marker 异步
 export const VIDEO_FETCH_REQUEST = "VIDEO_FETCH_REQUEST";
 export type VIDEO_FETCH_REQUEST = typeof VIDEO_FETCH_REQUEST;
@@ -38,3 +46,13 @@ export type VIDEO_FETCH_SUCCESS = typeof VIDEO_FETCH_SUCCESS;
 
 export const VIDEO_FETCH_ERROR = "VIDEO_FETCH_ERROR";
 export type VIDEO_FETCH_ERROR = typeof VIDEO_FETCH_ERROR;
+
+// update 异步
+export const VIDEO_UPDATE_REQUEST = "VIDEO_UPDATE_REQUEST";
+export type VIDEO_UPDATE_REQUEST = typeof VIDEO_UPDATE_REQUEST;
+
+export const VIDEO_UPDATE_SUCCESS = "VIDEO_UPDATE_SUCCESS";
+export type VIDEO_UPDATE_SUCCESS = typeof VIDEO_UPDATE_SUCCESS;
+
+export const VIDEO_UPDATE_ERROR = "VIDEO_UPDATE_ERROR";
+export type VIDEO_UPDATE_ERROR = typeof VIDEO_UPDATE_ERROR;

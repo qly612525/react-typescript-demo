@@ -11,7 +11,7 @@ export interface video {
     videos?: Array<any>;
     // proload?: string;
     error?: string;
-    current: any;
+    current?: number | null;
     // isModify?: boolean;
 }
 

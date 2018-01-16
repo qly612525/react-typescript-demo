@@ -5,6 +5,8 @@ import { connect, Dispatch } from 'react-redux';
 import { StoreState } from '../types';
 import * as actions from '../actions';
 
+import { getMarker } from '../api/feature';
+
 class Map extends React.Component<any, any> {
 
     private _init: boolean = true;
@@ -24,7 +26,6 @@ class Map extends React.Component<any, any> {
     }
 
     render() {
-        console.log('map-component: render');
         return (
             <div id="map" className="map"></div>
         );

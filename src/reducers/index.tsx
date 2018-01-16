@@ -4,7 +4,7 @@ import { requestReducer } from './request';
 
 const rootReducer = combineReducers({
     map: mapReducer,
-    request: requestReducer,
+    video: requestReducer,
 });
 
 export default rootReducer;

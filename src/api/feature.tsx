@@ -92,14 +92,10 @@ export function getMarker(info: any): ol.Feature {
     const markerModifyIcon = getIcon('/images/marker_modify.png', [36, 36], [0.5, 1]);
     const markerModifingIcon = getIcon('/images/marker_modifing.png', [36, 36], [0.5, 1]);
 
-    if (info['is_modify']) {
-        icon = markerModifyIcon;
-        coords = [parseFloat(info['n_x']), parseFloat(info['n_y'])];
-    } else {
-        icon = markerIcon;
-        coords = [parseFloat(info['o_x']), parseFloat(info['o_y'])] || [0, 0];
-    }
-
+    
+    icon = markerIcon;
+    coords = [parseFloat(info['x']), parseFloat(info['y'])] || [0, 0];
+    
     const style = new ol.style.Style({
         image: icon
     });
